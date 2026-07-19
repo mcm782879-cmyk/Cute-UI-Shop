@@ -7,6 +7,7 @@ import ordersRouter from "./orders";
 import paymentsRouter from "./payments";
 import galleryRouter from "./gallery";
 import adminRouter from "./admin";
+import settingsRouter from "./settings";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use(ordersRouter);
 router.use(paymentsRouter);
 router.use(galleryRouter);
 router.use(adminRouter);
+router.use(settingsRouter);
 
 export default router;

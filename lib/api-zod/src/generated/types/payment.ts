@@ -19,4 +19,6 @@ export interface Payment {
   /** @nullable */
   verifiedAt?: Date | null;
   createdAt: Date;
+  /** @nullable */
+  username?: string | null;
 }

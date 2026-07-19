@@ -19,6 +19,7 @@ import AdminServices from '@/pages/admin/services';
 import AdminPackages from '@/pages/admin/packages';
 import AdminPayments from '@/pages/admin/payments';
 import AdminGallery from '@/pages/admin/gallery';
+import AdminSettings from '@/pages/admin/settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/admin/packages/:serviceId" component={AdminPackages} />
         <Route path="/admin/payments" component={AdminPayments} />
         <Route path="/admin/gallery" component={AdminGallery} />
+        <Route path="/admin/settings" component={AdminSettings} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

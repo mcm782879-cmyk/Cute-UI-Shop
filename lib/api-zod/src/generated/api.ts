@@ -486,7 +486,8 @@ export const ListPaymentsResponseItem = zod.object({
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "note": zod.string().nullish(),
   "verifiedAt": zod.coerce.date().nullish(),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "username": zod.string().nullish()
 })
 export const ListPaymentsResponse = zod.array(ListPaymentsResponseItem)
 
@@ -508,7 +509,8 @@ export const UploadSlipResponse = zod.object({
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "note": zod.string().nullish(),
   "verifiedAt": zod.coerce.date().nullish(),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "username": zod.string().nullish()
 })
 
 
@@ -532,7 +534,8 @@ export const VerifyPaymentResponse = zod.object({
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "note": zod.string().nullish(),
   "verifiedAt": zod.coerce.date().nullish(),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "username": zod.string().nullish()
 })
 
 
@@ -614,6 +617,62 @@ export const GetAdminDashboardResponse = zod.object({
   "createdAt": zod.coerce.date()
 }).optional()
 }))
+})
+
+
+/**
+ * @summary Get site settings (public)
+ */
+export const GetSiteSettingsResponse = zod.object({
+  "heroTitle": zod.string(),
+  "heroSubtitle": zod.string(),
+  "announcement": zod.string().nullish(),
+  "trustItem1Title": zod.string(),
+  "trustItem1Desc": zod.string(),
+  "trustItem2Title": zod.string(),
+  "trustItem2Desc": zod.string(),
+  "trustItem3Title": zod.string(),
+  "trustItem3Desc": zod.string(),
+  "footerDescription": zod.string(),
+  "contactLine": zod.string().nullish(),
+  "contactDiscord": zod.string().nullish(),
+  "contactFacebook": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update site settings (admin)
+ */
+export const UpdateSiteSettingsBody = zod.object({
+  "heroTitle": zod.string().optional(),
+  "heroSubtitle": zod.string().optional(),
+  "announcement": zod.string().nullish(),
+  "trustItem1Title": zod.string().optional(),
+  "trustItem1Desc": zod.string().optional(),
+  "trustItem2Title": zod.string().optional(),
+  "trustItem2Desc": zod.string().optional(),
+  "trustItem3Title": zod.string().optional(),
+  "trustItem3Desc": zod.string().optional(),
+  "footerDescription": zod.string().optional(),
+  "contactLine": zod.string().nullish(),
+  "contactDiscord": zod.string().nullish(),
+  "contactFacebook": zod.string().nullish()
+})
+
+export const UpdateSiteSettingsResponse = zod.object({
+  "heroTitle": zod.string(),
+  "heroSubtitle": zod.string(),
+  "announcement": zod.string().nullish(),
+  "trustItem1Title": zod.string(),
+  "trustItem1Desc": zod.string(),
+  "trustItem2Title": zod.string(),
+  "trustItem2Desc": zod.string(),
+  "trustItem3Title": zod.string(),
+  "trustItem3Desc": zod.string(),
+  "footerDescription": zod.string(),
+  "contactLine": zod.string().nullish(),
+  "contactDiscord": zod.string().nullish(),
+  "contactFacebook": zod.string().nullish()
 })
 
 

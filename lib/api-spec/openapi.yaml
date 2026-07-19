@@ -24,6 +24,8 @@ tags:
     description: Gallery image management
   - name: admin
     description: Admin dashboard
+  - name: settings
+    description: Site settings
 
 paths:
   /healthz:
@@ -525,6 +527,39 @@ paths:
               schema:
                 $ref: "#/components/schemas/DashboardStats"
 
+  # ─── SITE SETTINGS ───────────────────────────────────────────
+  /settings:
+    get:
+      operationId: getSiteSettings
+      tags: [settings]
+      summary: Get site settings (public)
+      responses:
+        "200":
+          description: Site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
+  /admin/settings:
+    put:
+      operationId: updateSiteSettings
+      tags: [settings]
+      summary: Update site settings (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettingsInput"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
 components:
   schemas:
     HealthStatus:
@@ -805,6 +840,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        username:
+          type: ["string", "null"]
 
     # ─── GALLERY ─────────────────────────────────────────────────
     GalleryImageInput:
@@ -829,6 +866,68 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    # ─── SITE SETTINGS ───────────────────────────────────────────
+    SiteSettings:
+      type: object
+      required: [heroTitle, heroSubtitle, trustItem1Title, trustItem1Desc, trustItem2Title, trustItem2Desc, trustItem3Title, trustItem3Desc, footerDescription]
+      properties:
+        heroTitle:
+          type: string
+        heroSubtitle:
+          type: string
+        announcement:
+          type: ["string", "null"]
+        trustItem1Title:
+          type: string
+        trustItem1Desc:
+          type: string
+        trustItem2Title:
+          type: string
+        trustItem2Desc:
+          type: string
+        trustItem3Title:
+          type: string
+        trustItem3Desc:
+          type: string
+        footerDescription:
+          type: string
+        contactLine:
+          type: ["string", "null"]
+        contactDiscord:
+          type: ["string", "null"]
+        contactFacebook:
+          type: ["string", "null"]
+
+    SiteSettingsInput:
+      type: object
+      properties:
+        heroTitle:
+          type: string
+        heroSubtitle:
+          type: string
+        announcement:
+          type: ["string", "null"]
+        trustItem1Title:
+          type: string
+        trustItem1Desc:
+          type: string
+        trustItem2Title:
+          type: string
+        trustItem2Desc:
+          type: string
+        trustItem3Title:
+          type: string
+        trustItem3Desc:
+          type: string
+        footerDescription:
+          type: string
+        contactLine:
+          type: ["string", "null"]
+        contactDiscord:
+          type: ["string", "null"]
+        contactFacebook:
+          type: ["string", "null"]
 
     # ─── ADMIN DASHBOARD ─────────────────────────────────────────
     DashboardStats:

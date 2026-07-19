@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, UserCircle, Settings, Menu, X, ShoppingBag } from "lucide-react";
+import { LogOut, LayoutDashboard, UserCircle, Settings, Menu, X, ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -24,10 +24,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navItems = user?.role === "admin" 
     ? [
         { label: "แดชบอร์ด", href: "/admin", icon: LayoutDashboard },
-        { label: "ออเดอร์ทั้งหมด", href: "/admin/orders", icon: ShoppingBag },
-        { label: "บริการทั้งหมด", href: "/admin/services", icon: Settings },
-        { label: "รายการโอนเงิน", href: "/admin/payments", icon: UserCircle },
-        { label: "รูปภาพแกลลอรี่", href: "/admin/gallery", icon: Settings },
+        { label: "ออเดอร์", href: "/admin/orders", icon: ShoppingBag },
+        { label: "บริการ", href: "/admin/services", icon: Settings },
+        { label: "การโอนเงิน", href: "/admin/payments", icon: UserCircle },
+        { label: "แกลลอรี่", href: "/admin/gallery", icon: UserCircle },
+        { label: "ตั้งค่าเว็บ", href: "/admin/settings", icon: SlidersHorizontal },
       ]
     : user 
     ? [

@@ -5,3 +5,4 @@ export * from "./packages";
 export * from "./orders";
 export * from "./payments";
 export * from "./gallery";
+export * from "./siteSettings";

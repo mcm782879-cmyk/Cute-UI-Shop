@@ -198,6 +198,8 @@ export interface Payment {
   /** @nullable */
   verifiedAt?: string | null;
   createdAt: string;
+  /** @nullable */
+  username?: string | null;
 }
 
 export interface GalleryImageInput {
@@ -210,6 +212,46 @@ export interface GalleryImage {
   imageBase64: string;
   title: string;
   createdAt: string;
+}
+
+export interface SiteSettings {
+  heroTitle: string;
+  heroSubtitle: string;
+  /** @nullable */
+  announcement?: string | null;
+  trustItem1Title: string;
+  trustItem1Desc: string;
+  trustItem2Title: string;
+  trustItem2Desc: string;
+  trustItem3Title: string;
+  trustItem3Desc: string;
+  footerDescription: string;
+  /** @nullable */
+  contactLine?: string | null;
+  /** @nullable */
+  contactDiscord?: string | null;
+  /** @nullable */
+  contactFacebook?: string | null;
+}
+
+export interface SiteSettingsInput {
+  heroTitle?: string;
+  heroSubtitle?: string;
+  /** @nullable */
+  announcement?: string | null;
+  trustItem1Title?: string;
+  trustItem1Desc?: string;
+  trustItem2Title?: string;
+  trustItem2Desc?: string;
+  trustItem3Title?: string;
+  trustItem3Desc?: string;
+  footerDescription?: string;
+  /** @nullable */
+  contactLine?: string | null;
+  /** @nullable */
+  contactDiscord?: string | null;
+  /** @nullable */
+  contactFacebook?: string | null;
 }
 
 export interface DashboardStats {

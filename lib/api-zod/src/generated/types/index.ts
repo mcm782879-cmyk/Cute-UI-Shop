@@ -28,6 +28,8 @@ export * from './registerInput';
 export * from './service';
 export * from './serviceInput';
 export * from './serviceWithPackages';
+export * from './siteSettings';
+export * from './siteSettingsInput';
 export * from './slipInput';
 export * from './successResponse';
 export * from './user';

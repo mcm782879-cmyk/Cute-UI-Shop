@@ -1,19 +1,28 @@
 import { Router } from "express";
 import { eq, desc } from "drizzle-orm";
-import { db, paymentsTable, ordersTable } from "@workspace/db";
+import { db, paymentsTable, ordersTable, usersTable } from "@workspace/db";
 import { requireAuth, requireAdmin, type AuthRequest } from "../middlewares/auth";
 
 const router = Router();
 
-// GET /payments (admin)
+// GET /payments (admin) — includes username from joined order→user
 router.get("/payments", requireAdmin, async (req: AuthRequest, res): Promise<void> => {
-  const payments = await db.select().from(paymentsTable)
+  const rows = await db
+    .select({
+      payment: paymentsTable,
+      username: usersTable.username,
+    })
+    .from(paymentsTable)
+    .leftJoin(ordersTable, eq(paymentsTable.orderId, ordersTable.id))
+    .leftJoin(usersTable, eq(ordersTable.userId, usersTable.id))
     .orderBy(desc(paymentsTable.createdAt));
-  res.json(payments.map(p => ({
-    ...p,
-    amount: p.amount != null ? Number(p.amount) : null,
-    createdAt: p.createdAt.toISOString(),
-    verifiedAt: p.verifiedAt?.toISOString() ?? null,
+
+  res.json(rows.map(r => ({
+    ...r.payment,
+    amount: r.payment.amount != null ? Number(r.payment.amount) : null,
+    createdAt: r.payment.createdAt.toISOString(),
+    verifiedAt: r.payment.verifiedAt?.toISOString() ?? null,
+    username: r.username ?? null,
   })));
 });
 
@@ -31,7 +40,6 @@ router.post("/payments/slip", requireAuth, async (req: AuthRequest, res): Promis
     status: "pending",
   }).returning();
 
-  // Update order status to paid
   await db.update(ordersTable)
     .set({ status: "paid" })
     .where(eq(ordersTable.id, orderId));
@@ -41,6 +49,7 @@ router.post("/payments/slip", requireAuth, async (req: AuthRequest, res): Promis
     amount: payment.amount != null ? Number(payment.amount) : null,
     createdAt: payment.createdAt.toISOString(),
     verifiedAt: payment.verifiedAt?.toISOString() ?? null,
+    username: null,
   });
 });
 
@@ -61,7 +70,6 @@ router.put("/payments/:id/verify", requireAdmin, async (req: AuthRequest, res): 
 
   if (!updated) { res.status(404).json({ error: "ไม่พบการชำระเงิน" }); return; }
 
-  // Update order status based on payment verification
   if (status === "verified") {
     await db.update(ordersTable)
       .set({ status: "processing" })
@@ -73,6 +81,7 @@ router.put("/payments/:id/verify", requireAdmin, async (req: AuthRequest, res): 
     amount: updated.amount != null ? Number(updated.amount) : null,
     createdAt: updated.createdAt.toISOString(),
     verifiedAt: updated.verifiedAt?.toISOString() ?? null,
+    username: null,
   });
 });
 
