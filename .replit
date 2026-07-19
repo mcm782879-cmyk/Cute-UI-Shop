@@ -1,4 +1,4 @@
-modules = ["nodejs-24"]
+modules = ["nodejs-24", "postgresql-16"]
 
 [deployment]
 router = "application"
@@ -18,3 +18,15 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+ADMIN_PASSWORD_HASH = "RinMC123"
+ADMIN_USERNAME = "admin"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1528192463939043448/jjHMbA_3KnQSzHnrMjhzdG-phaIwprIjH6pnXe75AQoXmn6kFGh-5ms-k3TEySvCRZwA"
+PROMPTPAY_NUMBER = "1578736502"
+SHOP_NAME = "รินจัดให้"
+
+[nix]
+channel = "stable-25_05"

@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "รินจัดให้"
+version = "1.0.0"
+id = "artifacts/rin-shop"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18910
+
+[services.development]
+run = "pnpm --filter @workspace/rin-shop run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rin-shop", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/rin-shop/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18910"
+BASE_PATH = "/"
