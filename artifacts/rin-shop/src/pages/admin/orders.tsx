@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
 import { 
   useListOrders, 
   getListOrdersQueryKey,
@@ -8,7 +7,6 @@ import {
   OrderStatus,
   OrderStatusUpdateStatus 
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { 
@@ -40,11 +38,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 
 export default function AdminOrders() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const { data: orders, isLoading: ordersLoading, refetch } = useListOrders({
     query: { 
-      enabled: user?.role === 'admin',
+      enabled: true,
       queryKey: getListOrdersQueryKey()
     }
   });
@@ -55,12 +51,6 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [newStatus, setNewStatus] = useState<OrderStatusUpdateStatus | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
 
   const filteredOrders = orders?.filter(order => {
     const matchesSearch = 
@@ -113,7 +103,7 @@ export default function AdminOrders() {
     }
   };
 
-  if (authLoading || ordersLoading) {
+  if (ordersLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-8" />

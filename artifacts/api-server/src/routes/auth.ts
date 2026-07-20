@@ -290,7 +290,18 @@ router.get("/auth/discord/callback", async (req, res): Promise<void> => {
       user = created;
     }
 
-    // 5. Create session & redirect to frontend with token in URL param
+    // 5. Auto-elevate to admin if Discord ID matches DISCORD_ADMIN_ID env var
+    const adminDiscordId = process.env.DISCORD_ADMIN_ID;
+    if (adminDiscordId && discordId === adminDiscordId && user.role !== "admin") {
+      const [elevated] = await db.update(usersTable)
+        .set({ role: "admin" })
+        .where(eq(usersTable.id, user.id))
+        .returning();
+      user = elevated;
+      console.log(`[Discord OAuth] Elevated user ${user.username} to admin (Discord owner ID matched)`);
+    }
+
+    // 6. Create session & redirect to frontend with token in URL param
     const token = generateToken();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await db.insert(sessionsTable).values({ userId: user.id, token, expiresAt });

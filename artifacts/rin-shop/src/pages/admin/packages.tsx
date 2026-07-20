@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useRoute, Link } from "wouter";
+import { useState } from "react";
+import { useRoute, Link } from "wouter";
 import { 
   useGetService,
   getGetServiceQueryKey,
@@ -8,7 +8,6 @@ import {
   useDeletePackage,
   Package
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
@@ -41,14 +40,12 @@ const formSchema = z.object({
 });
 
 export default function AdminPackages() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const [, params] = useRoute("/admin/packages/:serviceId");
   const serviceId = params?.serviceId ? parseInt(params.serviceId, 10) : 0;
 
   const { data: service, isLoading: serviceLoading, refetch } = useGetService(serviceId, {
     query: { 
-      enabled: !!serviceId && user?.role === 'admin',
+      enabled: !!serviceId,
       queryKey: getGetServiceQueryKey(serviceId)
     }
   });
@@ -59,12 +56,6 @@ export default function AdminPackages() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -160,7 +151,7 @@ export default function AdminPackages() {
     }
   };
 
-  if (authLoading || serviceLoading) {
+  if (serviceLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-8" />

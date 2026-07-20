@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
 import { 
   useListGallery,
   useUploadGalleryImage,
   useDeleteGalleryImage
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { 
   UploadCloud,
   Trash2,
@@ -21,8 +19,6 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function AdminGallery() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const { data: gallery, isLoading: galleryLoading, refetch } = useListGallery();
   
   const uploadImage = useUploadGalleryImage();
@@ -30,12 +26,6 @@ export default function AdminGallery() {
 
   const [imageBase64, setImageBase64] = useState<string>("");
   const [title, setTitle] = useState("");
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -88,7 +78,7 @@ export default function AdminGallery() {
     }
   };
 
-  if (authLoading || galleryLoading) {
+  if (galleryLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-8" />

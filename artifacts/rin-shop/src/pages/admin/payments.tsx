@@ -1,5 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
-import { useLocation } from "wouter";
+import { useState, useMemo } from "react";
 import {
   useListPayments,
   getListPaymentsQueryKey,
@@ -8,7 +7,6 @@ import {
   PaymentStatus,
   PaymentVerifyInputStatus
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import {
@@ -26,10 +24,8 @@ import { toast } from "sonner";
 type FilterTab = "all" | "pending" | "verified" | "rejected";
 
 export default function AdminPayments() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const { data: payments, isLoading, refetch } = useListPayments({
-    query: { enabled: user?.role === "admin", queryKey: getListPaymentsQueryKey() }
+    query: { enabled: true, queryKey: getListPaymentsQueryKey() }
   });
   const verifyPayment = useVerifyPayment();
 
@@ -37,10 +33,6 @@ export default function AdminPayments() {
   const [actionType, setActionType] = useState<"verify" | "reject" | null>(null);
   const [note, setNote] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== "admin")) setLocation("/");
-  }, [user, authLoading, setLocation]);
 
   const stats = useMemo(() => {
     if (!payments) return { total: 0, pending: 0, verified: 0, rejected: 0, totalVerifiedAmount: 0 };
@@ -94,7 +86,7 @@ export default function AdminPayments() {
     { key: "rejected", label: "ไม่ผ่าน", count: stats.rejected },
   ];
 
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <Skeleton className="h-8 w-56 mb-6" />

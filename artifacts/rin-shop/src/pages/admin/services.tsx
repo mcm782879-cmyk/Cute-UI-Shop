@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useState } from "react";
+import { Link } from "wouter";
 import { 
   useListServices,
   useCreateService,
@@ -7,7 +7,6 @@ import {
   useDeleteService,
   Service
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -44,8 +43,6 @@ const formSchema = z.object({
 });
 
 export default function AdminServices() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const { data: services, isLoading: servicesLoading, refetch } = useListServices();
   
   const createService = useCreateService();
@@ -54,12 +51,6 @@ export default function AdminServices() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -153,7 +144,7 @@ export default function AdminServices() {
     }
   };
 
-  if (authLoading || servicesLoading) {
+  if (servicesLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-8" />

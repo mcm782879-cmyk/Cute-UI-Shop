@@ -1,11 +1,9 @@
-import { useEffect } from "react";
-import { useLocation, Link } from "wouter";
+import { Link } from "wouter";
 import { 
   useGetAdminDashboard,
   getGetAdminDashboardQueryKey,
   OrderStatus 
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { 
@@ -24,22 +22,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboard() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const { data: stats, isLoading: statsLoading } = useGetAdminDashboard({
     query: { 
-      enabled: user?.role === 'admin',
+      enabled: true,
       queryKey: getGetAdminDashboardQueryKey()
     }
   });
 
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'admin')) {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
-
-  if (authLoading || statsLoading) {
+  if (statsLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-8" />

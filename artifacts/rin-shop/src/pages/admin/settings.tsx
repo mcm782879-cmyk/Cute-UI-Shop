@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
 import {
   useGetSiteSettings,
   getGetSiteSettingsQueryKey,
   useUpdateSiteSettings,
   SiteSettings,
 } from "@workspace/api-client-react";
-import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { Save, Megaphone, Layout, ShieldCheck, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,18 +16,12 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
 export default function AdminSettings() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { data: settings, isLoading } = useGetSiteSettings({
     query: { queryKey: getGetSiteSettingsQueryKey() }
   });
   const updateSettings = useUpdateSiteSettings();
   const [form, setForm] = useState<SiteSettings | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== "admin")) setLocation("/");
-  }, [user, authLoading, setLocation]);
 
   useEffect(() => {
     if (settings && !form) setForm({ ...settings });
@@ -50,7 +42,7 @@ export default function AdminSettings() {
     });
   };
 
-  if (authLoading || isLoading || !form) {
+  if (isLoading || !form) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Skeleton className="h-8 w-48 mb-8" />

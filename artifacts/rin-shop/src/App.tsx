@@ -3,9 +3,11 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
-import { Route, Switch, Router as WouterRouter } from 'wouter';
+import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
 import { AuthProvider } from '@/hooks/use-auth';
 import Layout from '@/components/layout';
+import AdminLayout from '@/components/admin-layout';
+import AdminRoute from '@/components/admin-route';
 
 import Home from '@/pages/home';
 import ServiceDetail from '@/pages/service-detail';
@@ -31,6 +33,28 @@ const queryClient = new QueryClient({
 });
 
 function Router() {
+  const [location] = useLocation();
+  const isAdmin = location.startsWith('/admin');
+
+  if (isAdmin) {
+    return (
+      <AdminRoute>
+        <AdminLayout>
+          <Switch>
+            <Route path="/admin" component={AdminDashboard} />
+            <Route path="/admin/orders" component={AdminOrders} />
+            <Route path="/admin/services" component={AdminServices} />
+            <Route path="/admin/packages/:serviceId" component={AdminPackages} />
+            <Route path="/admin/payments" component={AdminPayments} />
+            <Route path="/admin/gallery" component={AdminGallery} />
+            <Route path="/admin/settings" component={AdminSettings} />
+            <Route component={NotFound} />
+          </Switch>
+        </AdminLayout>
+      </AdminRoute>
+    );
+  }
+
   return (
     <Layout>
       <Switch>
@@ -40,13 +64,6 @@ function Router() {
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/my-orders" component={MyOrdersPage} />
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/orders" component={AdminOrders} />
-        <Route path="/admin/services" component={AdminServices} />
-        <Route path="/admin/packages/:serviceId" component={AdminPackages} />
-        <Route path="/admin/payments" component={AdminPayments} />
-        <Route path="/admin/gallery" component={AdminGallery} />
-        <Route path="/admin/settings" component={AdminSettings} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
