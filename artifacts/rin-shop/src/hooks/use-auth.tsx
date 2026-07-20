@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useGetMe, setAuthTokenGetter, User, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useLocation } from "wouter";
 
 type AuthContextType = {
   user: User | null;
@@ -12,6 +13,20 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem("rin_token"));
+  const [, setLocation] = useLocation();
+
+  // Handle Discord OAuth2 callback — pick up ?discord_token= from the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const discordToken = params.get("discord_token");
+    if (discordToken) {
+      localStorage.setItem("rin_token", discordToken);
+      setToken(discordToken);
+      // Clean URL then redirect to orders
+      window.history.replaceState({}, "", window.location.pathname);
+      setLocation("/my-orders");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setAuthTokenGetter(() => localStorage.getItem("rin_token"));
