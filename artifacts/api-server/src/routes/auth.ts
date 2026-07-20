@@ -134,6 +134,20 @@ router.get("/auth/me", requireAuth, async (req: AuthRequest, res): Promise<void>
 
 // ─── Discord OAuth2 ───────────────────────────────────────────────────────────
 
+// GET /auth/discord/debug  →  show what redirect_uri is being used (dev only)
+router.get("/auth/discord/debug", (req, res): void => {
+  const base = getBaseUrl();
+  const callbackUrl = `${base}/api/auth/discord/callback`;
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  res.json({
+    REPLIT_DEV_DOMAIN: process.env.REPLIT_DEV_DOMAIN ?? "(not set)",
+    base,
+    redirect_uri: callbackUrl,
+    client_id_set: !!clientId,
+    client_secret_set: !!process.env.DISCORD_CLIENT_SECRET,
+  });
+});
+
 function getBaseUrl(): string {
   const domain = process.env.REPLIT_DEV_DOMAIN;
   if (domain) return `https://${domain}`;
@@ -148,9 +162,17 @@ router.get("/auth/discord", (_req, res): void => {
     return;
   }
 
-  const redirectUri = encodeURIComponent(`${getBaseUrl()}/api/auth/discord/callback`);
-  const scope = encodeURIComponent("identify email");
-  const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+  const callbackUrl = `${getBaseUrl()}/api/auth/discord/callback`;
+  console.log("[Discord OAuth] redirect_uri being sent to Discord:", callbackUrl);
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: callbackUrl,
+    response_type: "code",
+    scope: "identify email",
+  });
+  const url = `https://discord.com/oauth2/authorize?${params.toString()}`;
+  console.log("[Discord OAuth] full authorize URL:", url);
   res.redirect(url);
 });
 
