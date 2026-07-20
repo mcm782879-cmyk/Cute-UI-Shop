@@ -310,7 +310,7 @@ export default function AdminPackages() {
                 />
 
                 <div className="space-y-3">
-                  <FormLabel className="font-bold">รายการฟีเจอร์ (จุดเด่นที่ได้)</FormLabel>
+                  <p className="font-bold text-sm">รายการฟีเจอร์ (จุดเด่นที่ได้)</p>
                   {fields.map((field, index) => (
                     <FormField
                       key={field.id}
