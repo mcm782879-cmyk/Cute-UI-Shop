@@ -8,6 +8,7 @@ import paymentsRouter from "./payments";
 import galleryRouter from "./gallery";
 import adminRouter from "./admin";
 import settingsRouter from "./settings";
+import botConfigRouter from "./botConfig";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use(paymentsRouter);
 router.use(galleryRouter);
 router.use(adminRouter);
 router.use(settingsRouter);
+router.use(botConfigRouter);
 
 export default router;
