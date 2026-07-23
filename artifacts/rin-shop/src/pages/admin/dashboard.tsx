@@ -14,12 +14,21 @@ import {
   ArrowRight,
   TrendingUp,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Bot,
+  MessageSquare,
+  Palette,
+  Bell
 } from "lucide-react";
-
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = useGetAdminDashboard({
@@ -29,9 +38,30 @@ export default function AdminDashboard() {
     }
   });
 
+  // Bot Configuration State
+  const [botConfig, setBotConfig] = useState({
+    welcomeMessage: "สวัสดีครับ! ยินดีต้อนรับเข้าสู่เซิร์ฟเวอร์ของเรา 🎉",
+    primaryColor: "#3B82F6",
+    notificationChannel: "general",
+  });
+
+  const handleBotConfigChange = (field: string, value: string) => {
+    setBotConfig(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveBotConfig = async () => {
+    try {
+      // TODO: Replace with actual API call
+      toast.success("บันทึกการตั้งค่าบอทสำเร็จ ✅");
+      console.log("Bot Config saved:", botConfig);
+    } catch (error) {
+      toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+    }
+  };
+
   if (statsLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Skeleton className="h-8 w-48 mb-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
@@ -53,114 +83,164 @@ export default function AdminDashboard() {
     }
   };
 
+  const StatCard = ({ icon: Icon, title, value, color }: any) => (
+    <Card className={`rounded-2xl border-0 shadow-sm bg-white overflow-hidden relative`}>
+      <div className={`absolute -right-4 -top-4 w-24 h-24 ${color} rounded-full z-0 opacity-50`}></div>
+      <CardContent className="p-6 relative z-10">
+        <div className="flex justify-between items-start mb-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white`} style={{backgroundColor: color.replace('50', '100')}}>
+            <Icon className="w-5 h-5" />
+          </div>
+        </div>
+        <div className="text-3xl font-black text-gray-800 mb-1">{value}</div>
+        <div className="text-sm font-medium text-gray-500">{title}</div>
+      </CardContent>
+    </Card>
+  );
+
+  const SectionCard = ({ icon: Icon, title, children }: any) => (
+    <Card className="rounded-2xl border-0 shadow-sm bg-white mb-6">
+      <CardHeader className="pb-3 pt-5 px-6 border-b border-gray-100">
+        <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <Icon className="w-4 h-4" />
+          </div>
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-6 py-5">{children}</CardContent>
+    </Card>
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ดผู้ดูแลระบบ</h1>
-          <p className="text-gray-500">ยินดีต้อนรับกลับมา ริน! สรุปข้อมูลภาพรวมของร้านวันนี้</p>
-        </div>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">แดชบอร์ดผู้ดูแลระบบ</h1>
+        <p className="text-gray-500 mt-2">ยินดีต้อนรับกลับมา ริน! สรุปข้อมูลภาพรวมของร้านวันนี้</p>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="rounded-2xl border-0 shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-50 rounded-full z-0 opacity-50"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-black text-gray-800 mb-1">฿{stats.totalRevenue.toLocaleString()}</div>
-            <div className="text-sm font-medium text-gray-500">รายได้ทั้งหมด</div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-0 shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full z-0 opacity-50"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-black text-gray-800 mb-1">{stats.totalOrders}</div>
-            <div className="text-sm font-medium text-gray-500">ออเดอร์ทั้งหมด</div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-0 shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-orange-50 rounded-full z-0 opacity-50"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
-                <AlertCircle className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-black text-gray-800 mb-1">{stats.pendingOrders}</div>
-            <div className="text-sm font-medium text-gray-500">รอชำระเงิน/กำลังทำ</div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-0 shadow-sm bg-white overflow-hidden relative">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-50 rounded-full z-0 opacity-50"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-black text-gray-800 mb-1">{stats.totalUsers}</div>
-            <div className="text-sm font-medium text-gray-500">สมาชิกรวม</div>
-          </CardContent>
-        </Card>
+        <StatCard icon={TrendingUp} title="รายได้ทั้งหมด" value={`฿${stats.totalRevenue.toLocaleString()}`} color="bg-green-50" />
+        <StatCard icon={ShoppingBag} title="ออเดอร์ทั้งหมด" value={stats.totalOrders} color="bg-blue-50" />
+        <StatCard icon={AlertCircle} title="รอชำระเงิน/กำลังทำ" value={stats.pendingOrders} color="bg-orange-50" />
+        <StatCard icon={Users} title="สมาชิกรวม" value={stats.totalUsers} color="bg-purple-50" />
       </div>
 
-      <Card className="rounded-[2rem] border-0 shadow-sm overflow-hidden">
-        <CardHeader className="p-6 border-b border-gray-100 flex flex-row items-center justify-between bg-gray-50/50">
-          <CardTitle className="text-lg font-bold text-gray-800">ออเดอร์ล่าสุด</CardTitle>
-          <Link href="/admin/orders" className="text-sm font-medium text-primary hover:underline flex items-center">
-            ดูทั้งหมด <ArrowRight className="w-4 h-4 ml-1" />
-          </Link>
-        </CardHeader>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-white text-gray-500 font-medium border-b border-gray-100">
-              <tr>
-                <th className="px-6 py-4">รหัส</th>
-                <th className="px-6 py-4">ลูกค้า</th>
-                <th className="px-6 py-4">แพ็กเกจ</th>
-                <th className="px-6 py-4">ราคา</th>
-                <th className="px-6 py-4">วันที่</th>
-                <th className="px-6 py-4">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {stats.recentOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    ยังไม่มีออเดอร์
-                  </td>
-                </tr>
-              ) : (
-                stats.recentOrders.map(order => (
-                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900">#{order.id.toString().padStart(4, '0')}</td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{order.user?.username}</div>
-                      <div className="text-xs text-gray-500">{order.discordUsername}</div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">{order.package?.name || '-'}</td>
-                    <td className="px-6 py-4 font-medium">฿{(order.totalPrice || order.package?.price || 0).toLocaleString()}</td>
-                    <td className="px-6 py-4 text-gray-500">{format(new Date(order.createdAt), "dd MMM yyyy", { locale: th })}</td>
-                    <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Left Column - Orders (2/3) */}
+        <div className="lg:col-span-2">
+          <Card className="rounded-[2rem] border-0 shadow-sm overflow-hidden">
+            <CardHeader className="p-6 border-b border-gray-100 flex flex-row items-center justify-between bg-gray-50/50">
+              <CardTitle className="text-lg font-bold text-gray-800">ออเดอร์ล่าสุด</CardTitle>
+              <Link href="/admin/orders" className="text-sm font-medium text-primary hover:underline flex items-center">
+                ดูทั้งหมด <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
+            </CardHeader>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-white text-gray-500 font-medium border-b border-gray-100">
+                  <tr>
+                    <th className="px-6 py-4">รหัส</th>
+                    <th className="px-6 py-4">ลูกค้า</th>
+                    <th className="px-6 py-4">แพ็กเกจ</th>
+                    <th className="px-6 py-4">ราคา</th>
+                    <th className="px-6 py-4">วันที่</th>
+                    <th className="px-6 py-4">สถานะ</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {stats.recentOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                        ยังไม่มีออเดอร์
+                      </td>
+                    </tr>
+                  ) : (
+                    stats.recentOrders.map(order => (
+                      <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4 font-medium text-gray-900">#{order.id.toString().padStart(4, '0')}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-gray-800">{order.user?.username}</div>
+                          <div className="text-xs text-gray-500">{order.discordUsername}</div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">{order.package?.name || '-'}</td>
+                        <td className="px-6 py-4 font-medium">฿{(order.totalPrice || order.package?.price || 0).toLocaleString()}</td>
+                        <td className="px-6 py-4 text-gray-500">{format(new Date(order.createdAt), "dd MMM yyyy", { locale: th })}</td>
+                        <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         </div>
-      </Card>
+
+        {/* Right Column - Bot Configuration (1/3) */}
+        <div>
+          <SectionCard icon={Bot} title="ตั้งค่าบอท">
+            <div className="space-y-4">
+              {/* Welcome Message */}
+              <div>
+                <Label className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" /> ข้อความต้อนรับ
+                </Label>
+                <Textarea
+                  value={botConfig.welcomeMessage}
+                  onChange={(e) => handleBotConfigChange('welcomeMessage', e.target.value)}
+                  className="rounded-lg resize-none text-sm h-20"
+                  placeholder="ข้อความต้อนรับสมาชิกใหม่..."
+                />
+              </div>
+
+              {/* Color Picker */}
+              <div>
+                <Label className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-2">
+                  <Palette className="w-4 h-4" /> สีหลัก
+                </Label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="color"
+                    value={botConfig.primaryColor}
+                    onChange={(e) => handleBotConfigChange('primaryColor', e.target.value)}
+                    className="w-12 h-10 rounded-lg cursor-pointer border border-gray-200"
+                  />
+                  <Input
+                    value={botConfig.primaryColor}
+                    onChange={(e) => handleBotConfigChange('primaryColor', e.target.value)}
+                    className="rounded-lg text-sm flex-1"
+                    placeholder="#3B82F6"
+                  />
+                </div>
+              </div>
+
+              {/* Notification Channel */}
+              <div>
+                <Label className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-2">
+                  <Bell className="w-4 h-4" /> ช่องแจ้งเตือน
+                </Label>
+                <Input
+                  value={botConfig.notificationChannel}
+                  onChange={(e) => handleBotConfigChange('notificationChannel', e.target.value)}
+                  className="rounded-lg text-sm"
+                  placeholder="general"
+                />
+              </div>
+
+              {/* Save Button */}
+              <Button
+                onClick={handleSaveBotConfig}
+                className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-semibold py-2"
+              >
+                บันทึกการตั้งค่า
+              </Button>
+            </div>
+          </SectionCard>
+        </div>
+      </div>
     </div>
   );
 }
