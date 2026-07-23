@@ -18,9 +18,10 @@ import {
   Bot,
   MessageSquare,
   Palette,
-  Bell
+  Bell,
+  Save
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+
+interface BotConfig {
+  welcomeMessage: string;
+  primaryColor: string;
+  notificationChannel: string;
+  autoRespond: boolean;
+  respondDelay: number;
+}
 
 export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = useGetAdminDashboard({
@@ -38,24 +48,58 @@ export default function AdminDashboard() {
     }
   });
 
-  // Bot Configuration State
-  const [botConfig, setBotConfig] = useState({
+  const queryClient = useQueryClient();
+  const [botConfig, setBotConfig] = useState<BotConfig>({
     welcomeMessage: "สวัสดีครับ! ยินดีต้อนรับเข้าสู่เซิร์ฟเวอร์ของเรา 🎉",
     primaryColor: "#3B82F6",
     notificationChannel: "general",
+    autoRespond: true,
+    respondDelay: 1000,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleBotConfigChange = (field: string, value: string) => {
+  // Fetch bot config on mount
+  useEffect(() => {
+    const fetchBotConfig = async () => {
+      try {
+        const response = await fetch("/api/admin/bot-config");
+        if (response.ok) {
+          const data = await response.json();
+          setBotConfig(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch bot config:", error);
+      }
+    };
+    fetchBotConfig();
+  }, []);
+
+  const handleBotConfigChange = (field: keyof BotConfig, value: any) => {
     setBotConfig(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSaveBotConfig = async () => {
+    setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      toast.success("บันทึกการตั้งค่าบอทสำเร็จ ✅");
-      console.log("Bot Config saved:", botConfig);
+      const response = await fetch("/api/admin/bot-config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(botConfig),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setBotConfig(data);
+        toast.success("บันทึกการตั้งค่าบอทสำเร็จ ✅");
+        queryClient.invalidateQueries({ queryKey: ["botConfig"] });
+      } else {
+        toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      }
     } catch (error) {
-      toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      console.error("Error saving bot config:", error);
+      toast.error("เกิดข้อผิดพลาด");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,7 +122,7 @@ export default function AdminDashboard() {
       case OrderStatus.pending: return <Badge variant="outline" className="bg-orange-50 text-orange-600"><AlertCircle className="w-3 h-3 mr-1"/> รอชำระเงิน</Badge>;
       case OrderStatus.paid: return <Badge variant="outline" className="bg-blue-50 text-blue-600"><CreditCard className="w-3 h-3 mr-1"/> แจ้งโอนแล้ว</Badge>;
       case OrderStatus.processing: return <Badge variant="outline" className="bg-purple-50 text-purple-600"><Clock className="w-3 h-3 mr-1"/> กำลังทำ</Badge>;
-      case OrderStatus.completed: return <Badge variant="outline" className="bg-green-50 text-green-600"><CheckCircle2 className="w-3 h-3 mr-1"/> เสร็จสิ้น</Badge>;
+      case OrderStatus.completed: return <Badge variant="outline" className="bg-green-50 text-green-600"><CheckCircle2 className="w-3 h-3 mr-1"/> เสร็จส���้น</Badge>;
       default: return <Badge>{status}</Badge>;
     }
   };
@@ -230,12 +274,28 @@ export default function AdminDashboard() {
                 />
               </div>
 
+              {/* Auto Respond */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={botConfig.autoRespond}
+                  onChange={(e) => handleBotConfigChange('autoRespond', e.target.checked)}
+                  className="w-4 h-4 rounded cursor-pointer"
+                  id="autoRespond"
+                />
+                <Label htmlFor="autoRespond" className="text-sm font-semibold text-gray-600 cursor-pointer">
+                  ตอบกลับอัตโนมัติก้
+                </Label>
+              </div>
+
               {/* Save Button */}
               <Button
                 onClick={handleSaveBotConfig}
-                className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-semibold py-2"
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-semibold py-2 flex items-center justify-center gap-2"
               >
-                บันทึกการตั้งค่า
+                <Save className="w-4 h-4" />
+                {isLoading ? "กำลังบันทึก..." : "บันทึกการตั้งค่า"}
               </Button>
             </div>
           </SectionCard>
